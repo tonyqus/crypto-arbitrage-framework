@@ -21,12 +21,20 @@ def get_withdrawal_fees(exchange, trading_size=1000):
 
         for ele in tree.xpath('//div[@class="table"]//tbody//tr'):
             coin_name = ele.xpath('.//td[@class="coinName"]//div[@class="name"]/text()')[0]
-            usd_fee = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="usd"]/text()')[0]
-            coin_fee = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="fee"]/text()')[
-                0] if usd_fee != 'Free' else 'Free'
+            accountlessNode = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="usd"]/a/text()')
+            if len(accountlessNode)>0 :
+                usd_fee = accountlessNode[0]
+            else:
+                usd_fee = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="usd"]/text()')[0]
+            if usd_fee == 'Free':
+                coin_fee = 'Free'
+            elif usd_fee == 'Accountless':
+                coin_fee = 'Accountless'
+            else:
+                coin_fee = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="fee"]/text()')[0]
 
-            usd_fee = 0 if usd_fee == 'Free' else float(re.findall(r'[0-9\.]+', usd_fee)[0])
-            coin_fee = 0 if coin_fee == 'Free' else float(re.findall(r'[0-9\.]+', coin_fee)[0])
+            usd_fee = 0 if usd_fee == 'Free' or usd_fee=='Accountless' else float(re.findall(r'[0-9\.]+', usd_fee)[0])
+            coin_fee = 0 if coin_fee == 'Free' or coin_fee=='Accountless' else float(re.findall(r'[0-9\.]+', coin_fee)[0])
 
             withdrawal_fee[coin_name] = {
                 'usd_fee': usd_fee,
