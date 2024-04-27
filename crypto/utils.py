@@ -19,14 +19,14 @@ def get_withdrawal_fees(exchange, trading_size=1000):
     if response.ok:
         tree = html.fromstring(response.content)
 
-        for ele in tree.xpath('//tbody//tr'):
-            coin_name = ele.xpath('.//div[@class="symbol"]/text()')[0]
+        for ele in tree.xpath('//div[@class="table"]//tbody//tr'):
+            coin_name = ele.xpath('.//td[@class="coinName"]//div[@class="name"]/text()')[0]
             usd_fee = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="usd"]/text()')[0]
             coin_fee = ele.xpath('.//td[@class="withdrawalFee"]//div[@class="fee"]/text()')[
-                0] if usd_fee != 'FREE' else 'FREE'
+                0] if usd_fee != 'Free' else 'Free'
 
-            usd_fee = 0 if usd_fee == 'FREE' else float(re.findall(r'[0-9\.]+', usd_fee)[0])
-            coin_fee = 0 if coin_fee == 'FREE' else float(re.findall(r'[0-9\.]+', coin_fee)[0])
+            usd_fee = 0 if usd_fee == 'Free' else float(re.findall(r'[0-9\.]+', usd_fee)[0])
+            coin_fee = 0 if coin_fee == 'Free' else float(re.findall(r'[0-9\.]+', coin_fee)[0])
 
             withdrawal_fee[coin_name] = {
                 'usd_fee': usd_fee,
